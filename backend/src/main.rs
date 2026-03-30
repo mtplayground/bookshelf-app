@@ -1,5 +1,6 @@
 use axum::{Json, Router, routing::get};
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use types::HealthResponse;
@@ -31,9 +32,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .merge(routes::books::router())
         .with_state(pool);
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let app = api_routes
         .fallback_service(ServeDir::new("frontend/dist"))
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(cors);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     tracing::info!("Server listening on {addr}");
