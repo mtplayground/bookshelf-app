@@ -87,7 +87,7 @@ pub struct BookWithAuthor {
 
 // Query / Stats
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct BookQuery {
     pub search: Option<String>,
     pub genre: Option<String>,
