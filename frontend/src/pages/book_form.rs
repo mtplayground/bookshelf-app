@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_router::components::A;
 use leptos_router::hooks::{use_navigate, use_params_map};
-use types::{Author, CreateBook, UpdateBook};
+use types::{AuthorSummary, CreateBook, UpdateBook};
 
 use crate::api;
 
@@ -43,7 +43,7 @@ pub fn BookForm() -> impl IntoView {
     let cover_url = RwSignal::new(String::new());
     let description = RwSignal::new(String::new());
 
-    let authors = RwSignal::new(None::<Result<Vec<Author>, String>>);
+    let authors = RwSignal::new(None::<Result<Vec<AuthorSummary>, String>>);
     let error = RwSignal::new(None::<String>);
     let submitting = RwSignal::new(false);
     let loaded = RwSignal::new(false);

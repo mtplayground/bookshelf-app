@@ -33,6 +33,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/authors") view=Authors />
                     <Route path=path!("/authors/:id") view=AuthorDetail />
                     <Route path=path!("/add-author") view=AuthorForm />
+                    <Route path=path!("/edit-author/:id") view=AuthorForm />
                 </Routes>
             </main>
         </Router>

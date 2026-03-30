@@ -68,7 +68,7 @@ pub async fn delete_book(id: i64) -> Result<(), String> {
     Ok(())
 }
 
-pub async fn fetch_authors() -> Result<Vec<Author>, String> {
+pub async fn fetch_authors() -> Result<Vec<AuthorSummary>, String> {
     let resp = Request::get("/api/authors")
         .send()
         .await
