@@ -4,6 +4,8 @@ use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use types::HealthResponse;
 
+mod db;
+
 async fn health() -> Json<HealthResponse> {
     Json(HealthResponse {
         status: "ok".to_string(),
@@ -19,7 +21,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .init();
 
-    let api_routes = Router::new().route("/api/health", get(health));
+    let pool = db::init_pool().await?;
+
+    let api_routes = Router::new()
+        .route("/api/health", get(health))
+        .with_state(pool);
 
     let app = api_routes
         .fallback_service(ServeDir::new("frontend/dist"))
