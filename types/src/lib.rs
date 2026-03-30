@@ -30,6 +30,13 @@ pub struct UpdateAuthor {
     pub bio: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorWithBooks {
+    #[serde(flatten)]
+    pub author: Author,
+    pub books: Vec<Book>,
+}
+
 // Books
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
