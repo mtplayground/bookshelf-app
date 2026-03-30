@@ -279,6 +279,63 @@ h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
     color: var(--text-muted);
 }
 
+/* Book cards */
+.book-card {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    gap: 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+}
+
+.book-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+}
+
+.book-cover {
+    flex-shrink: 0;
+    width: 60px;
+}
+
+.book-cover svg {
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+}
+
+.book-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.book-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-author {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.375rem;
+}
+
+.book-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.book-year {
+    font-size: 0.8rem;
+}
+
 /* Detail page */
 .detail-header { margin-bottom: 1.5rem; }
 .detail-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
