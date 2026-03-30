@@ -63,7 +63,7 @@ pub struct Book {
     pub created_at: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct CreateBook {
     pub title: String,
     pub author_id: i64,
@@ -75,7 +75,7 @@ pub struct CreateBook {
     pub description: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateBook {
     pub title: Option<String>,
     pub author_id: Option<i64>,

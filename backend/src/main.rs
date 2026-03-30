@@ -1,19 +1,7 @@
-use axum::{Json, Router, routing::get};
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use types::HealthResponse;
-
-mod db;
-mod errors;
-mod routes;
-
-async fn health() -> Json<HealthResponse> {
-    Json(HealthResponse {
-        status: "ok".to_string(),
-    })
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,20 +12,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .init();
 
-    let pool = db::init_pool().await?;
-
-    let api_routes = Router::new()
-        .route("/api/health", get(health))
-        .merge(routes::authors::router())
-        .merge(routes::books::router())
-        .with_state(pool);
+    let pool = backend::db::init_pool().await?;
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let app = api_routes
+    let app = backend::build_app(pool)
         .fallback_service(ServeDir::new("frontend/dist"))
         .layer(TraceLayer::new_for_http())
         .layer(cors);
