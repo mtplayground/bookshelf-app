@@ -1,13 +1,24 @@
+# Build artifacts
 target/
 node_modules/
+frontend/dist/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Environment / secrets
 .gh_token
-.claude/
 .database_url
+.github_token
+
+# CI/task metadata
+.claude/
 .task_id
 .container_name
 .app_name
 .gh_user
-.github_token
 .pipeline-state.json
 .gitkeep
 .progress
