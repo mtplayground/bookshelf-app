@@ -2,7 +2,7 @@ use axum::extract::{Path, State};
 use axum::routing::get;
 use axum::{Json, Router};
 use sqlx::SqlitePool;
-use types::{Author, AuthorWithBooks, Book, CreateAuthor, UpdateAuthor};
+use types::{Author, AuthorSummary, AuthorWithBooks, Book, CreateAuthor, UpdateAuthor};
 
 use crate::errors::AppError;
 
@@ -15,12 +15,36 @@ pub fn router() -> Router<SqlitePool> {
         )
 }
 
-async fn list_authors(State(pool): State<SqlitePool>) -> Result<Json<Vec<Author>>, AppError> {
-    let authors = sqlx::query_as::<_, Author>("SELECT id, name, bio, created_at FROM authors ORDER BY name")
-        .fetch_all(&pool)
-        .await?;
+async fn list_authors(State(pool): State<SqlitePool>) -> Result<Json<Vec<AuthorSummary>>, AppError> {
+    let rows = sqlx::query_as::<_, AuthorSummaryRow>(
+        "SELECT a.id, a.name, a.bio, a.created_at, COUNT(b.id) as book_count \
+         FROM authors a LEFT JOIN books b ON b.author_id = a.id \
+         GROUP BY a.id ORDER BY a.name",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let authors = rows
+        .into_iter()
+        .map(|r| AuthorSummary {
+            id: r.id,
+            name: r.name,
+            bio: r.bio,
+            book_count: r.book_count,
+            created_at: r.created_at,
+        })
+        .collect();
 
     Ok(Json(authors))
+}
+
+#[derive(sqlx::FromRow)]
+struct AuthorSummaryRow {
+    id: i64,
+    name: String,
+    bio: Option<String>,
+    book_count: i64,
+    created_at: String,
 }
 
 async fn create_author(
