@@ -10,9 +10,12 @@ use crate::pages::book_form::BookForm;
 use crate::pages::home::Home;
 use crate::pages::not_found::NotFound;
 use crate::pages::stats::Stats;
+use crate::toast::{ToastContainer, ToastState};
 
 #[component]
 pub fn App() -> impl IntoView {
+    provide_context(ToastState::new());
+
     view! {
         <Router>
             <header>
@@ -38,6 +41,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/stats") view=Stats />
                 </Routes>
             </main>
+            <ToastContainer />
         </Router>
     }
 }
