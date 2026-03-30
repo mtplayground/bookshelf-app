@@ -28,6 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_routes = Router::new()
         .route("/api/health", get(health))
         .merge(routes::authors::router())
+        .merge(routes::books::router())
         .with_state(pool);
 
     let app = api_routes

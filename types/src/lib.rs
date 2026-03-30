@@ -77,3 +77,33 @@ pub struct UpdateBook {
     pub cover_url: Option<String>,
     pub description: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BookWithAuthor {
+    #[serde(flatten)]
+    pub book: Book,
+    pub author_name: String,
+}
+
+// Query / Stats
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct BookQuery {
+    pub search: Option<String>,
+    pub genre: Option<String>,
+    pub sort: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenreCount {
+    pub genre: String,
+    pub count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BookStats {
+    pub total_books: i64,
+    pub total_authors: i64,
+    pub avg_rating: Option<f64>,
+    pub books_by_genre: Vec<GenreCount>,
+}
