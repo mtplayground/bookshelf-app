@@ -2,7 +2,10 @@ use axum::extract::{Path, Query, State};
 use axum::routing::get;
 use axum::{Json, Router};
 use sqlx::SqlitePool;
-use types::{Book, BookQuery, BookStats, BookWithAuthor, CreateBook, GenreCount, UpdateBook};
+use types::{
+    AuthorBookCount, Book, BookQuery, BookStats, BookWithAuthor, CreateBook, GenreCount,
+    RecentBook, TopBook, UpdateBook,
+};
 
 use crate::errors::AppError;
 
@@ -257,11 +260,67 @@ async fn book_stats(State(pool): State<SqlitePool>) -> Result<Json<BookStats>, A
         })
         .collect();
 
+    let top_rows = sqlx::query_as::<_, TopBookRow>(
+        "SELECT b.id, b.title, a.name as author_name, b.rating \
+         FROM books b JOIN authors a ON b.author_id = a.id \
+         WHERE b.rating IS NOT NULL ORDER BY b.rating DESC, b.title ASC LIMIT 5",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let top_rated = top_rows
+        .into_iter()
+        .map(|r| TopBook {
+            id: r.id,
+            title: r.title,
+            author_name: r.author_name,
+            rating: r.rating,
+        })
+        .collect();
+
+    let prolific_rows = sqlx::query_as::<_, ProlificRow>(
+        "SELECT a.id, a.name, COUNT(b.id) as book_count \
+         FROM authors a JOIN books b ON b.author_id = a.id \
+         GROUP BY a.id ORDER BY book_count DESC, a.name ASC LIMIT 5",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let most_prolific = prolific_rows
+        .into_iter()
+        .map(|r| AuthorBookCount {
+            id: r.id,
+            name: r.name,
+            book_count: r.book_count,
+        })
+        .collect();
+
+    let recent_rows = sqlx::query_as::<_, RecentBookRow>(
+        "SELECT b.id, b.title, a.name as author_name, b.created_at \
+         FROM books b JOIN authors a ON b.author_id = a.id \
+         ORDER BY b.created_at DESC LIMIT 5",
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    let recently_added = recent_rows
+        .into_iter()
+        .map(|r| RecentBook {
+            id: r.id,
+            title: r.title,
+            author_name: r.author_name,
+            created_at: r.created_at,
+        })
+        .collect();
+
     Ok(Json(BookStats {
         total_books,
         total_authors,
         avg_rating,
         books_by_genre,
+        top_rated,
+        most_prolific,
+        recently_added,
     }))
 }
 
@@ -334,4 +393,27 @@ impl BookWithAuthorRow {
 struct GenreCountRow {
     genre: String,
     count: i64,
+}
+
+#[derive(sqlx::FromRow)]
+struct TopBookRow {
+    id: i64,
+    title: String,
+    author_name: String,
+    rating: i32,
+}
+
+#[derive(sqlx::FromRow)]
+struct ProlificRow {
+    id: i64,
+    name: String,
+    book_count: i64,
+}
+
+#[derive(sqlx::FromRow)]
+struct RecentBookRow {
+    id: i64,
+    title: String,
+    author_name: String,
+    created_at: String,
 }

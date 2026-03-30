@@ -110,9 +110,35 @@ pub struct GenreCount {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthorBookCount {
+    pub id: i64,
+    pub name: String,
+    pub book_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopBook {
+    pub id: i64,
+    pub title: String,
+    pub author_name: String,
+    pub rating: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RecentBook {
+    pub id: i64,
+    pub title: String,
+    pub author_name: String,
+    pub created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BookStats {
     pub total_books: i64,
     pub total_authors: i64,
     pub avg_rating: Option<f64>,
     pub books_by_genre: Vec<GenreCount>,
+    pub top_rated: Vec<TopBook>,
+    pub most_prolific: Vec<AuthorBookCount>,
+    pub recently_added: Vec<RecentBook>,
 }

@@ -9,6 +9,7 @@ use crate::pages::book_detail::BookDetail;
 use crate::pages::book_form::BookForm;
 use crate::pages::home::Home;
 use crate::pages::not_found::NotFound;
+use crate::pages::stats::Stats;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -34,6 +35,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/authors/:id") view=AuthorDetail />
                     <Route path=path!("/add-author") view=AuthorForm />
                     <Route path=path!("/edit-author/:id") view=AuthorForm />
+                    <Route path=path!("/stats") view=Stats />
                 </Routes>
             </main>
         </Router>
