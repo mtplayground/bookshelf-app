@@ -4,6 +4,7 @@ use leptos_router::hooks::{use_navigate, use_params_map};
 use types::{AuthorSummary, CreateBook, UpdateBook};
 
 use crate::api;
+use crate::toast::use_toast;
 
 const GENRES: &[&str] = &[
     "Biography",
@@ -84,6 +85,7 @@ pub fn BookForm() -> impl IntoView {
         }
     });
 
+    let toast = use_toast();
     let on_submit = {
         let nav = nav.clone();
         move |ev: leptos::ev::SubmitEvent| {
@@ -141,9 +143,13 @@ pub fn BookForm() -> impl IntoView {
                 };
                 leptos::task::spawn_local(async move {
                     match api::update_book(id, &book).await {
-                        Ok(b) => nav(&format!("/books/{}", b.id), Default::default()),
+                        Ok(b) => {
+                            toast.success("Book updated successfully");
+                            nav(&format!("/books/{}", b.id), Default::default());
+                        }
                         Err(e) => {
                             submitting.set(false);
+                            toast.error(&e);
                             error.set(Some(e));
                         }
                     }
@@ -177,9 +183,13 @@ pub fn BookForm() -> impl IntoView {
                 };
                 leptos::task::spawn_local(async move {
                     match api::create_book(&book).await {
-                        Ok(b) => nav(&format!("/books/{}", b.id), Default::default()),
+                        Ok(b) => {
+                            toast.success("Book created successfully");
+                            nav(&format!("/books/{}", b.id), Default::default());
+                        }
                         Err(e) => {
                             submitting.set(false);
+                            toast.error(&e);
                             error.set(Some(e));
                         }
                     }

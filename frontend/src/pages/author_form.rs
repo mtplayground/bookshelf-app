@@ -4,6 +4,7 @@ use leptos_router::hooks::{use_navigate, use_params_map};
 use types::{CreateAuthor, UpdateAuthor};
 
 use crate::api;
+use crate::toast::use_toast;
 
 #[component]
 pub fn AuthorForm() -> impl IntoView {
@@ -42,6 +43,7 @@ pub fn AuthorForm() -> impl IntoView {
         }
     });
 
+    let toast = use_toast();
     let on_submit = {
         let nav = nav.clone();
         move |ev: leptos::ev::SubmitEvent| {
@@ -65,9 +67,13 @@ pub fn AuthorForm() -> impl IntoView {
                 };
                 leptos::task::spawn_local(async move {
                     match api::update_author(id, &author).await {
-                        Ok(a) => nav(&format!("/authors/{}", a.id), Default::default()),
+                        Ok(a) => {
+                            toast.success("Author updated successfully");
+                            nav(&format!("/authors/{}", a.id), Default::default());
+                        }
                         Err(e) => {
                             submitting.set(false);
+                            toast.error(&e);
                             error.set(Some(e));
                         }
                     }
@@ -79,9 +85,13 @@ pub fn AuthorForm() -> impl IntoView {
                 };
                 leptos::task::spawn_local(async move {
                     match api::create_author(&author).await {
-                        Ok(a) => nav(&format!("/authors/{}", a.id), Default::default()),
+                        Ok(a) => {
+                            toast.success("Author created successfully");
+                            nav(&format!("/authors/{}", a.id), Default::default());
+                        }
                         Err(e) => {
                             submitting.set(false);
+                            toast.error(&e);
                             error.set(Some(e));
                         }
                     }

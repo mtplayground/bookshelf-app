@@ -4,11 +4,13 @@ use leptos_router::hooks::{use_navigate, use_params_map};
 use types::AuthorWithBooks;
 
 use crate::api;
+use crate::toast::use_toast;
 
 #[component]
 pub fn AuthorDetail() -> impl IntoView {
     let params = use_params_map();
     let nav = use_navigate();
+    let toast = use_toast();
     let author = RwSignal::new(None::<Result<AuthorWithBooks, String>>);
     let deleting = RwSignal::new(false);
 
@@ -56,13 +58,24 @@ pub fn AuthorDetail() -> impl IntoView {
                         <button
                             class="btn btn-danger"
                             on:click=move |_| {
+                                let confirmed = web_sys::window()
+                                    .unwrap()
+                                    .confirm_with_message("Are you sure you want to delete this author? This cannot be undone.")
+                                    .unwrap_or(false);
+                                if !confirmed {
+                                    return;
+                                }
                                 let nav = nav.clone();
                                 deleting.set(true);
                                 leptos::task::spawn_local(async move {
                                     match api::delete_author(delete_id).await {
-                                        Ok(()) => nav("/authors", Default::default()),
+                                        Ok(()) => {
+                                            toast.success("Author deleted successfully");
+                                            nav("/authors", Default::default());
+                                        }
                                         Err(e) => {
                                             deleting.set(false);
+                                            toast.error(&e);
                                             author.set(Some(Err(e)));
                                         }
                                     }
