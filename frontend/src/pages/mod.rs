@@ -5,3 +5,4 @@ pub mod authors;
 pub mod author_detail;
 pub mod author_form;
 pub mod not_found;
+pub mod stats;
