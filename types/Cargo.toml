@@ -5,3 +5,8 @@ edition = "2024"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
+sqlx = { version = "0.8", features = ["sqlite"], optional = true }
+
+[features]
+default = []
+backend = ["sqlx"]
