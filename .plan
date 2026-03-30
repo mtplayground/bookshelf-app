@@ -1,0 +1,37 @@
+# Bookshelf App Architecture Plan
+
+## Overview
+A full-stack Rust web application using Axum (backend) and Leptos CSR (frontend) with shared types.
+
+## Workspace Structure
+```
+Cargo.toml          # workspace root
+backend/
+  Cargo.toml
+  src/main.rs       # Axum server on 0.0.0.0:8080, serves API + static files
+frontend/
+  Cargo.toml
+  src/main.rs       # Leptos 0.7+ CSR app entry point
+  src/app.rs        # Root app component
+  index.html        # Trunk entry HTML
+  Trunk.toml        # Trunk config with /api/ proxy to backend
+types/
+  Cargo.toml
+  src/lib.rs        # Shared types (serde Serialize/Deserialize)
+```
+
+## Key Design Decisions
+- **Leptos CSR (client-side rendering)** via Trunk, not SSR — keeps frontend and backend cleanly separated
+- **Trunk.toml** proxies `/api/` to `http://127.0.0.1:8080` during dev
+- **Backend** uses `tower-http::services::ServeDir` to serve `frontend/dist` as fallback for production
+- **types/** crate shared by both backend and frontend for API request/response types
+- Backend binds `0.0.0.0:8080`
+
+## Dependencies
+- backend: axum, tokio, tower-http, serde, serde_json, types (path dep)
+- frontend: leptos 0.7+, serde, serde_json, types (path dep), reqwasm/gloo-net for HTTP
+- types: serde (with derive feature)
+
+## Issue #1: Initialize Rust workspace
+Sets up the entire scaffolding above with minimal hello-world endpoints and components.
+No other issues exist yet — this is the foundation.
